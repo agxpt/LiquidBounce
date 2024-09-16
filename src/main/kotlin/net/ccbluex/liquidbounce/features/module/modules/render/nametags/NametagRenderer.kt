@@ -28,6 +28,7 @@ import net.minecraft.client.gui.DrawContext
 import net.minecraft.client.render.VertexFormat
 import net.minecraft.item.ItemStack
 import org.lwjgl.opengl.GL11
+import kotlin.math.sqrt
 
 private const val NAMETAG_PADDING: Int = 5
 private const val ITEM_SIZE: Int = 20
@@ -56,7 +57,10 @@ class NametagRenderer {
     ) {
         val c = Fonts.DEFAULT_FONT_SIZE.toFloat()
 
-        val scale = 1.0F / (c * 0.15F) * ModuleNametags.scale
+        val dist = sqrt(mc.cameraEntity!!.squaredDistanceTo(pos.toVec3d())).toFloat()
+        val distScale = Math.clamp(1.0F - dist * 0.01F, 0.5F, Float.MAX_VALUE)
+
+        val scale = 1.0F / (c * 0.15F) * ModuleNametags.scale * distScale
 
         env.matrixStack.push()
         env.matrixStack.translate(pos.x, pos.y, pos.z)
@@ -67,7 +71,7 @@ class NametagRenderer {
                 ModuleNametags.fontRenderer.process(info.text),
                 0.0F,
                 0.0F,
-                shadow = true,
+                shadow = false,
                 z = 0.001F,
             )
 
